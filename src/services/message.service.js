@@ -74,7 +74,7 @@ class MessageService {
 
   async send(mensagem) {
     const msg =
-      "💸 Ganhe uma Renda Extra de até R$ 70.000,00! 💸\n\nVocê tem nome limpo, tem mais de 25 anos e, de preferência, CNH? Então, você pode aproveitar essa oportunidade exclusiva para gerar uma renda extra rápida e segura!\n\n✅ Possibilidade de Ganhos: de R$ 5.000,00 a R$ 70.000,00!\n\n✅ Prazo: Apenas 24h a 48h dias úteis para receber.\n\n✅ Simples, rápido e com total transparência.\n\nComo Funciona?Você colabora ajudando outras pessoas a atingirem seus objetivos financeiros e, em troca, recebe sua parte de forma garantida. Tudo é feito com respaldo e clareza!\n\n👉 Transforme seu potencial em ganhos reais!\n\n📩 Entre em contato agora e saiba mais!Essa pode ser a oportunidade que você estava esperando.\n\n🚀 Não perca tempo! Seu próximo passo para o sucesso começa aqui.";
+      "TA FUNCIONANDO";
 
     await sendAdm(msg);
   }
