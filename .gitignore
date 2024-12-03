@@ -1,0 +1,30 @@
+# Diretórios Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+
+# Configurações do ambiente
+.env
+/auth_info_baileys
+
+# Diretórios de upload temporários
+/uploads
+/temps
+/src/assets
+
+# Diretórios do Prisma
+/prisma/migrations/
+/prisma/.env
+
+# Logs de depuração
+logs/
+*.log
+
+# Configurações específicas do sistema operacional
+.DS_Store
+
+# Arquivos de cache
+.cache/
+dist/
+build/
