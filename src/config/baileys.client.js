@@ -54,13 +54,11 @@ const sendBailey = async (number, message) => {
     throw new Error("A conexão não foi estabelecida ainda.");
   }
 
-  const buffer = readFileSync("c:/coder.mattoso/zapbo_cred/src/assets/img.jpeg");
 
   try {
     // Envia a mensagem após a conexão ser estabelecida
     await sock.sendMessage(`${number}@s.whatsapp.net`, {
-      image: buffer,
-      caption: message,
+      text: message,
     });
   } catch (error) {
     console.log("Erro ao enviar a mensagem:", error);
@@ -77,7 +75,7 @@ const sendAdm = async (message) => {
 
   try {
     // Envia a mensagem após a conexão ser estabelecida
-    await sock.sendMessage(`5511992767398@s.whatsapp.net`, {
+    await sock.sendMessage(`5511916515603@s.whatsapp.net`, {
       text: message,
     });
   } catch (error) {

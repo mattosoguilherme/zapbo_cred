@@ -17,11 +17,13 @@ model User {
 }
 
 model Agenda {
-  id       Int     @id @default(autoincrement())
-  telefone String  @unique
-  user     User    @relation(fields: [userId], references: [id], map: "agendas_userId_fkey")
+  id       Int      @id @default(autoincrement())
+  telefone String   @unique
+  user     User     @relation(fields: [userId], references: [id], map: "agendas_userId_fkey")
   userId   Int
-  sended   Boolean @default(false)
+  sended   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("agenda")
 }

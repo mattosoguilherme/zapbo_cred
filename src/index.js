@@ -1,4 +1,3 @@
-
 const express = require("express");
 const app = express();
 const port = 3001 || process.env.PORT;
@@ -19,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/", Routers);
 app.use("/api", swagger.serve, swagger.setup(swaggerDocument));
 
-// connect();
+connect();
 app.listen(port, () => {
   console.log(`app rodando na porta: http://localhost:${port}/api`);
 });

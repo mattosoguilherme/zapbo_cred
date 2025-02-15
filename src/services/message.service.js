@@ -5,8 +5,8 @@ const path = require("path");
 
 class MessageService {
   constructor() {
-    this.startHour = 7; // Hora de início (7h da manhã, por exemplo)
-    this.endHour = 21; // Hora de término (21h, por exemplo)
+    this.startHour = 6; // Hora de início (7h da manhã, por exemplo)
+    this.endHour = 22; // Hora de término (21h, por exemplo)
     this.delay = 4 * 60 * 1000; // 4 minutos em milissegundos (240000 ms)
   }
 
@@ -30,7 +30,7 @@ class MessageService {
     if (verifyCpf) {
       throw new Error(`CPF ${user.cpf} já cadastrado`);
     }
- 
+
     for (const t in telefones) {
       const verifyTelefone = await prisma.agenda.findUnique({
         where: { telefone: `55${t}` },
@@ -39,7 +39,7 @@ class MessageService {
         throw new Error(`Telefone ${t} já cadastrado`);
       }
     }
-  
+
     return await prisma.user.create({
       data: {
         nome: user.nome,
@@ -84,9 +84,9 @@ class MessageService {
     const endDate = new Date();
     endDate.setHours(23, 59, 59, 999); // Fim do dia
 
-    const totalMessages = await prisma.messageLog.count({
+    const totalMessages = await prisma.agenda.count({
       where: {
-        sentAt: {
+        updatedAt: {
           gte: startDate,
           lte: endDate,
         },
@@ -94,7 +94,7 @@ class MessageService {
     });
 
     await sendAdm(
-      `Sr. Mattoso, boa noite\n\nFim do espediente.\n\nsegue o relatório do dia:\n\n*${totalMessages}* mensagens enviadas.\n\n*PRODUTO: RENDA EXTRA*`
+      `Sra. Romina, boa noite!\n\nZapbo chegou no fim do espediente.\n\nsegue o relatório do dia:\n\n*${totalMessages}* mensagens enviadas.\n\n*PRODUTO: FGTS*\n\nLembra o Guilherme de programar o envio de mensagens para amanhã.\n\n Ótima noite!`
     );
   }
 
@@ -112,7 +112,7 @@ class MessageService {
   }
 
   async getNumbers() {
-    return await prisma.contacts.findMany();
+    return await prisma.agenda.findMany();
   }
 
   async send(mensagem) {
@@ -134,16 +134,16 @@ class MessageService {
 
     const teste = [
       { number: "5511992767398", id: 1 },
-      { number: "5511992767398", id: 2 },
+      { number: "5511965888365", id: 2 },
       { number: "5511992767398", id: 3 },
     ];
 
     const contatos = (await this.getNumbers()).filter(
-      (objeto) => objeto.status === "PENDENTE" || objeto.status === "PEDDING"
+      (agenda) => agenda.sended === false
     );
 
     const msg =
-      "💸 Ganhe uma Renda Extra de até R$ 70.000,00! 💸\n\nVocê tem nome limpo, tem mais de 25 anos e, de preferência, CNH? Então, você pode aproveitar essa oportunidade exclusiva para gerar uma renda extra rápida e segura!\n\n✅ Possibilidade de Ganhos: de R$ 5.000,00 a R$ 70.000,00!\n✅ Prazo: Apenas 3 a 5 dias úteis para receber.\n✅ Simples, rápido e com total transparência.\n\nComo Funciona?Você colabora ajudando outras pessoas a atingirem seus objetivos financeiros e, em troca, recebe sua parte de forma garantida. Tudo é feito com respaldo e clareza!\n\n👉 Transforme seu potencial em ganhos reais!\n\n📩 *Entre em contato agora e saiba mais!Essa pode ser a oportunidade que você estava esperando.*\n\n🚀Não perca tempo! Corre que temos poucas vagas estou disponibilizando as ultimas vagas!!! \n\nResponda *Como participo?* que em alguns instantes um de nossos consultores irá te atender.";
+      "💰 **Precisando de dinheiro rápido?** 💰\n\n🚀 Saque seu **FGTS bloqueado** em menos de **10 minutos** – mesmo com cadeado! ✅\n\n🔥 **Sem burocracia, sem complicação!** 🔥\n\n📲 Chame agora no WhatsApp e resolva sua vida financeira:\n\n👉 [CLIQUE AQUI](https://wa.me/5511916515603) 👈";
 
     while (true) {
       if (!this.isWithinSchedule()) {
@@ -158,24 +158,17 @@ class MessageService {
       for (let contato of contatos) {
         await sendBailey(contato.number, msg)
           .then(async () => {
+
+            await prisma.agenda.update({
+              where: { id: contato.id },
+              data: { sended: true },
+            });
+
             console.log(
               `Mensagem enviada para ${
                 contato.number
               } às ${new Date().toLocaleTimeString()}`
             );
-
-            await prisma.contacts.update({
-              where: { id: contato.id },
-              data: { status: "ENVIADO" },
-            });
-            await prisma.messagelogs.create({
-              data: {
-                contactId: contato.id,
-                message: ` Mensagem enviada para ${
-                  contato.number
-                } às ${new Date().toLocaleTimeString()}`,
-              },
-            });
           })
           .catch((error) => {
             console.log("Erro ao enviar mensagem:", error);
