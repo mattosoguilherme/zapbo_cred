@@ -4,7 +4,7 @@ info:
   description: API para gerenciar números de mensagens.
   version: 1.0.0
 servers:
-  - url: http://localhost:3000/
+  - url: http://localhost:3001/
     description: zapbo-cred API server
 
 paths:

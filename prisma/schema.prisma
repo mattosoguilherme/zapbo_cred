@@ -7,21 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Contacts {
-  id          Int          @id @default(autoincrement())
-  number      String       @unique
-  status      String       @default("PENDENTE")
-  created_at  DateTime     @default(now())
-  updated_at  DateTime
-  messagelogs messagelogs?
+model User {
+  id     Int      @id @default(autoincrement())
+  nome   String
+  cpf    String   @unique
+  Agenda Agenda[]
 
-  @@map("contacts")
+  @@map("users")
 }
 
-model messagelogs {
-  id        Int      @id @default(autoincrement())
-  message   String
-  contactId Int      @unique(map: "messageLogs_contactId_key")
-  sentAt    DateTime @default(now())
-  contacts  Contacts @relation(fields: [contactId], references: [id], map: "messageLogs_contactId_fkey")
+model Agenda {
+  id       Int     @id @default(autoincrement())
+  telefone String  @unique
+  user     User    @relation(fields: [userId], references: [id], map: "agendas_userId_fkey")
+  userId   Int
+  sended   Boolean @default(false)
+
+  @@map("agenda")
 }

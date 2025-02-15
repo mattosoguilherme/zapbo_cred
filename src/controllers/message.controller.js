@@ -6,38 +6,28 @@ const path = require("path");
 class MessageController {
   async addNumber(req, res) {
     try {
-      const diretoryPath = "c:/coder.mattoso/zapbo_cred/temps/";
-      const n_voltas = messageService.countFilesInDirectory(diretoryPath); // Defina o número de voltas
-      let list_numbers = [];
-      
-      
+      const diretoryPath = "c:/arkg.solutions/solutions/zapbo_fgts/temps/";
 
-      for (let i = 1; i <= n_voltas; i++) {
-        const file_path = path.join(diretoryPath, `grupo (${i}).json`);
+      const file_path = path.join(diretoryPath, `dados_filtrados.json`);
 
-        if (!fs.existsSync(file_path))
-          throw new Error(`Arquivo não encontrado: ${file_path}`);
+      if (!fs.existsSync(file_path))
+        throw new Error(`Arquivo não encontrado: ${file_path}`);
 
-        const contatos = JSON.parse(fs.readFileSync(file_path, "utf-8"));
+      const clientes = JSON.parse(fs.readFileSync(file_path, "utf-8"));
 
-      
-
-        await Promise.all(
-          contatos.map(async (c) => {
-            const numeroFormatado = c.phone_number.replace("+", "");
-            const numeroExistente = await messageService.addNumber(
-              numeroFormatado
-            );
-            list_numbers.push(numeroExistente);
-          })
-        );
-      }
+      await Promise.all(
+        clientes.map(async (c) => {
+          await messageService.create_user(c);
+        })
+      );
 
       res.status(200).json({
-        message: `${list_numbers.length} números adicionados com sucesso`,
+        message: ` números adicionados com sucesso`,
       });
     } catch (error) {
       res.status(500).json({ message: "Erro ao adicionar números", error });
+
+      console.log(error)
     }
   }
 

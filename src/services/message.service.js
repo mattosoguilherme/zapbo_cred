@@ -7,7 +7,50 @@ class MessageService {
   constructor() {
     this.startHour = 7; // Hora de início (7h da manhã, por exemplo)
     this.endHour = 21; // Hora de término (21h, por exemplo)
-    this.delay = 4 * 60 * 1000; // 2 minutos em milissegundos (240000 ms)
+    this.delay = 4 * 60 * 1000; // 4 minutos em milissegundos (240000 ms)
+  }
+
+  async create_user(
+    user = {
+      nome: "",
+      cpf: 0,
+      telefone_principal: 0,
+      telefones_secundarios: [0],
+    }
+  ) {
+    let telefones = [];
+
+    telefones.push(user.telefone_principal);
+    telefones = [...telefones, ...user.telefones_secundarios];
+
+    const verifyCpf = await prisma.user.findUnique({
+      where: { cpf: String(user.cpf) },
+    });
+
+    if (verifyCpf) {
+      throw new Error(`CPF ${user.cpf} já cadastrado`);
+    }
+ 
+    for (const t in telefones) {
+      const verifyTelefone = await prisma.agenda.findUnique({
+        where: { telefone: `55${t}` },
+      });
+      if (verifyTelefone) {
+        throw new Error(`Telefone ${t} já cadastrado`);
+      }
+    }
+  
+    return await prisma.user.create({
+      data: {
+        nome: user.nome,
+        cpf: String(user.cpf),
+        Agenda: {
+          create: telefones.map((t = 0) => ({
+            telefone: `55${t}`,
+          })),
+        },
+      },
+    });
   }
 
   async generateDailyReport(date) {
@@ -73,8 +116,7 @@ class MessageService {
   }
 
   async send(mensagem) {
-    const msg =
-      "TA FUNCIONANDO";
+    const msg = "TA FUNCIONANDO";
 
     await sendAdm(msg);
   }
