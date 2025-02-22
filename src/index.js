@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = 3001 || process.env.PORT;
+const port = 3004 
 const bodyParser = require("body-parser");
 const Routers = require("../src/routes/message.routes");
 const YAML = require("yamljs");

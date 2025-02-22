@@ -78,7 +78,7 @@ class MessageService {
     );
   }
 
-  async relatoriofimdodia() {
+  async endofdayreport() {
     const startDate = new Date();
     startDate.setHours(0, 0, 0, 0); // Início do dia
     const endDate = new Date();
@@ -129,25 +129,14 @@ class MessageService {
   }
 
   async sendToMany() {
-    // // Espera até o horário de início para começar
-    // await this.waitUntilStartHour();
-
-    // const teste = [
-    //   { number: "5511992767398", id: 1 },
-    //   { number: "5511965888365", id: 2 },
-    //   { number: "5511992767398", id: 3 },
-    // ];
-
     const contatos = (await this.getNumbers()).filter(
       (agenda) => agenda.sended === false
     );
-   
 
     const msg =
       "💰 **Precisando de dinheiro rápido?** 💰\n\n🚀 Saque seu **FGTS bloqueado** em menos de **10 minutos** – mesmo com cadeado! ✅\n\n🔥 **Sem burocracia, sem complicação!** 🔥\n\n📲 Chame agora no WhatsApp e resolva sua vida financeira:\n\n👉 [CLIQUE AQUI](https://wa.me/5511916515603) 👈";
 
     while (true) {
-
       if (!this.isWithinSchedule()) {
         console.log("Fora do horário permitido.");
 
@@ -160,7 +149,6 @@ class MessageService {
       for (let contato of contatos) {
         await sendBailey(contato.telefone, msg)
           .then(async () => {
-
             await prisma.agenda.update({
               where: { id: contato.id },
               data: { sended: true },
@@ -176,36 +164,17 @@ class MessageService {
             console.log("Erro ao enviar mensagem:", error);
           });
 
-        // Espera 2 minutos antes de enviar a próxima mensagem
+        // Espera 4 minutos antes de enviar a próxima mensagem
         await new Promise((resolve) => setTimeout(resolve, 4 * 60 * 1000));
 
         if (!this.isWithinSchedule()) {
           console.log("por hoje deu...");
-          await this.relatoriofimdodia();
+          await this.endofdayreport();
           break;
         }
       }
 
       break;
-    }
-  }
-
-  countFilesInDirectory(directoryPath) {
-    try {
-      // Lê o diretório de forma síncrona e filtra apenas arquivos
-      const files = fs.readdirSync(directoryPath);
-      const fileCount = files.filter((file) => {
-        const filePath = path.join(directoryPath, file);
-        return fs.lstatSync(filePath).isFile();
-      }).length;
-
-      console.log(
-        `Número de arquivos na pasta '${directoryPath}': ${fileCount}`
-      );
-      return fileCount;
-    } catch (err) {
-      console.error(`Erro ao ler o diretório: ${err.message}`);
-      return 0; // Retorna 0 em caso de erro
     }
   }
 }
