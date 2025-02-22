@@ -132,31 +132,33 @@ class MessageService {
     // // Espera até o horário de início para começar
     // await this.waitUntilStartHour();
 
-    const teste = [
-      { number: "5511992767398", id: 1 },
-      { number: "5511965888365", id: 2 },
-      { number: "5511992767398", id: 3 },
-    ];
+    // const teste = [
+    //   { number: "5511992767398", id: 1 },
+    //   { number: "5511965888365", id: 2 },
+    //   { number: "5511992767398", id: 3 },
+    // ];
 
     const contatos = (await this.getNumbers()).filter(
       (agenda) => agenda.sended === false
     );
+   
 
     const msg =
       "💰 **Precisando de dinheiro rápido?** 💰\n\n🚀 Saque seu **FGTS bloqueado** em menos de **10 minutos** – mesmo com cadeado! ✅\n\n🔥 **Sem burocracia, sem complicação!** 🔥\n\n📲 Chame agora no WhatsApp e resolva sua vida financeira:\n\n👉 [CLIQUE AQUI](https://wa.me/5511916515603) 👈";
 
     while (true) {
+
       if (!this.isWithinSchedule()) {
         console.log("Fora do horário permitido.");
 
-        await new Promise((resolve) => setTimeout(resolve, 5 * 60 * 1000)); // Espera 5min e tenta novamente;
+        await new Promise((resolve) => setTimeout(resolve, 4 * 60 * 1000)); // Espera 5min e tenta novamente;
         continue; // Volta ao início do loop para verificar o horário novamente
       }
 
-      console.log("Enviando mensagens...");
+      console.log("Enviando mensagens...aguarde 4 minutos");
 
       for (let contato of contatos) {
-        await sendBailey(contato.number, msg)
+        await sendBailey(contato.telefone, msg)
           .then(async () => {
 
             await prisma.agenda.update({
@@ -166,7 +168,7 @@ class MessageService {
 
             console.log(
               `Mensagem enviada para ${
-                contato.number
+                contato.telefone
               } às ${new Date().toLocaleTimeString()}`
             );
           })
@@ -175,7 +177,7 @@ class MessageService {
           });
 
         // Espera 2 minutos antes de enviar a próxima mensagem
-        await new Promise((resolve) => setTimeout(resolve, this.delay));
+        await new Promise((resolve) => setTimeout(resolve, 4 * 60 * 1000));
 
         if (!this.isWithinSchedule()) {
           console.log("por hoje deu...");

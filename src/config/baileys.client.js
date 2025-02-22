@@ -1,92 +1,106 @@
-const { Boom } = require("@hapi/boom");
+const { Boom } = require("@hapi/boom"); // Utilizada para erros mais estruturados (não está sendo usada diretamente aqui)
 const {
   DisconnectReason,
   useMultiFileAuthState,
   makeWASocket,
   Browsers,
-} = require("@whiskeysockets/baileys");
-const { log } = require("console");
-const { readFileSync } = require("fs");
+} = require("@whiskeysockets/baileys"); // Baileys é a biblioteca que implementa o WhatsApp Web API
 
-let sock = null; // Variável global para armazenar o socket
-let state = null; // Variável global para o estado de autenticação
-let saveCreds = null; // Variável global para a função de salvar credenciais
+// Declaração de variáveis globais
+let sock = null; // Variável para armazenar a instância do socket do WhatsApp
+let state = null; // Variável para armazenar o estado de autenticação
+let saveCreds = null; // Função para salvar as credenciais de autenticação
+let isConnected = false; // Flag para indicar se a conexão com o WhatsApp foi estabelecida
 
-// Função para inicializar o estado de autenticação e conectar
+// Função assíncrona para conectar ao WhatsApp
 const connect = async () => {
+  // Obtém o estado de autenticação, que pode ser salvo em múltiplos arquivos
   const authState = await useMultiFileAuthState("auth_info_baileys");
-  state = authState.state; // Salva o estado de autenticação
-  saveCreds = authState.saveCreds; // Salva a função de salvar credenciais
+  state = authState.state; 
+  saveCreds = authState.saveCreds; 
 
-  // Conecta usando o estado de autenticação fornecido
+  // Criação da instância do socket para comunicação com o WhatsApp
   sock = makeWASocket({
-    auth: state, // Usa o estado armazenado
-    printQRInTerminal: true,
-    browser: Browsers.windows("Desktop"),
+    auth: state, 
+    printQRInTerminal: true, // Exibe o QR Code no terminal para escanear
+    browser: Browsers.windows("Desktop"), // Define o nome do browser (usado para conectar)
   });
 
-  // Escuta eventos de conexão
-  sock.ev.on("connection.update", (update) => {
-    const { connection, lastDisconnect } = update;
-    if (connection === "close") {
-      const shouldReconnect =
-        lastDisconnect.error instanceof Boom &&
-        lastDisconnect.error.output?.statusCode !== DisconnectReason.loggedOut;
-
-      // Reconectar se não estiver desconectado (logged out)
-      if (shouldReconnect) {
-        connect(); // Rechama a função connect para reconectar
+  // Evento que captura as mensagens de WhatsApp
+  sock.ev.on("messages.upsert", async ({ messages }) => {
+    for (const msg of messages) {
+      if (msg.key.remoteJid === "status@broadcast") {
+        // Ignora as mensagens de status do WhatsApp (broadcasts)
+        console.log("📢 Ignorando mensagem de Status...");
+        return; 
       }
-    } else if (connection === "open") {
-      console.log("Conexão estabelecida");
     }
   });
 
-  // Atualiza as credenciais sempre que houver uma mudança
+  // Evento que lida com atualizações de conexão
+  sock.ev.on("connection.update", async (update) => {
+    const { connection, lastDisconnect } = update;
+
+    if (connection === "close") {
+      const errorCode = lastDisconnect?.error?.output?.statusCode; // Captura o código de erro da desconexão
+      console.log(`⚠️ Conexão fechada. Código: ${errorCode}`);
+
+      if (errorCode === DisconnectReason.loggedOut) {
+        console.log("🚨 Usuário deslogado. Escaneie o QR Code novamente.");
+        isConnected = false;
+        return;
+      }
+
+      console.log("🔄 Tentando reconectar...");
+      isConnected = false; 
+      setTimeout(connect, 5000); 
+    } else if (connection === "open") {
+ 
+      console.log("✅ Conexão estabelecida!");
+      isConnected = true; 
+    }
+  });
+
+  // Atualiza as credenciais de autenticação quando há alterações
   sock.ev.on("creds.update", saveCreds);
 };
 
-// Função para enviar mensagens
+// Função assíncrona para aguardar a conexão ser estabelecida
+const waitForConnection = async () => {
+  let attempts = 0; // Contador de tentativas
+  while (!isConnected) {
+    if (attempts >= 15) throw new Error("⏳ Tempo limite atingido para conexão!"); // Se não conectar em 15 tentativas, lança erro
+    console.log("⏳ Aguardando conexão...");
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Aguarda 2 segundos antes de tentar novamente
+    attempts++; // Incrementa o contador de tentativas
+  }
+};
+
+// Função assíncrona para enviar mensagens para um número específico
 const sendBailey = async (number, message) => {
-  // Verifica se o socket está conectado
-  if (!sock) {
-    console.log("A conexão não foi estabelecida ainda.");
-    throw new Error("A conexão não foi estabelecida ainda.");
-  }
-
+  if (!sock) throw new Error("🚫 Socket não inicializado."); 
+  await waitForConnection(); // Aguarda a conexão ser estabelecida antes de enviar
 
   try {
-    // Envia a mensagem após a conexão ser estabelecida
-    await sock.sendMessage(`${number}@s.whatsapp.net`, {
-      text: message,
-    });
+    console.log(`📤 Enviando mensagem para ${number}...`);
+    // Envia a mensagem usando o socket
+    await sock.sendMessage(`${number}@s.whatsapp.net`, { text: message });
+    console.log(`✅ Mensagem enviada para ${number}`);
   } catch (error) {
-    console.log("Erro ao enviar a mensagem:", error);
-    throw error;
+    console.error("❌ Erro ao enviar mensagem:", error.message || error); // Trata erros ao enviar mensagem
+    throw error; // Relança o erro
   }
 };
 
+// Função para enviar uma mensagem específica para o administrador
 const sendAdm = async (message) => {
-  // Verifica se o socket está conectado
-  if (!sock) {
-    console.log("A conexão não foi estabelecida ainda.");
-    throw new Error("A conexão não foi estabelecida ainda.");
-  }
-
-  try {
-    // Envia a mensagem após a conexão ser estabelecida
-    await sock.sendMessage(`5511916515603@s.whatsapp.net`, {
-      text: message,
-    });
-  } catch (error) {
-    console.log("Erro ao enviar a mensagem:", error);
-    throw error;
-  }
+  
+  await sendBailey("5511916515603", message);
 };
 
-// Exporta as funções
+// Exporta as funções para uso externo
 module.exports = {
-  connect,
-  sendBailey,
-  sendAdm,
+  connect, 
+  sendBailey, 
+  sendAdm, 
 };
