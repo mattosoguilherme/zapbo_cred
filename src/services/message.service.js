@@ -153,12 +153,6 @@ class MessageService {
               where: { id: contato.id },
               data: { sended: true },
             });
-
-            console.log(
-              `Mensagem enviada para ${
-                contato.telefone
-              } às ${new Date().toLocaleTimeString()}`
-            );
           })
           .catch((error) => {
             console.log("Erro ao enviar mensagem:", error);

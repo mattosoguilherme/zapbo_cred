@@ -16,12 +16,12 @@ let isConnected = false; // Flag para indicar se a conexão com o WhatsApp foi e
 const connect = async () => {
   // Obtém o estado de autenticação, que pode ser salvo em múltiplos arquivos
   const authState = await useMultiFileAuthState("auth_info_baileys");
-  state = authState.state; 
-  saveCreds = authState.saveCreds; 
+  state = authState.state;
+  saveCreds = authState.saveCreds;
 
   // Criação da instância do socket para comunicação com o WhatsApp
   sock = makeWASocket({
-    auth: state, 
+    auth: state,
     printQRInTerminal: true, // Exibe o QR Code no terminal para escanear
     browser: Browsers.windows("Desktop"), // Define o nome do browser (usado para conectar)
   });
@@ -32,7 +32,7 @@ const connect = async () => {
       if (msg.key.remoteJid === "status@broadcast") {
         // Ignora as mensagens de status do WhatsApp (broadcasts)
         console.log("📢 Ignorando mensagem de Status...");
-        return; 
+        return;
       }
     }
   });
@@ -52,13 +52,12 @@ const connect = async () => {
       }
 
       console.log("🔄 Tentando reconectar...");
-      isConnected = false; 
-      setTimeout(connect, 5000); 
+      isConnected = false;
+      setTimeout(connect, 5000);
     } else if (connection === "open") {
- 
       console.log("✅ Conexão estabelecida!");
-      console.log('Número logado:', sock.user.id.split(':')[0]); 
-      isConnected = true; 
+      console.log("Número logado:", sock.user.id.split(":")[0]);
+      isConnected = true;
     }
   });
 
@@ -70,7 +69,8 @@ const connect = async () => {
 const waitForConnection = async () => {
   let attempts = 0; // Contador de tentativas
   while (!isConnected) {
-    if (attempts >= 15) throw new Error("⏳ Tempo limite atingido para conexão!"); // Se não conectar em 15 tentativas, lança erro
+    if (attempts >= 15)
+      throw new Error("⏳ Tempo limite atingido para conexão!"); // Se não conectar em 15 tentativas, lança erro
     console.log("⏳ Aguardando conexão...");
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Aguarda 2 segundos antes de tentar novamente
     attempts++; // Incrementa o contador de tentativas
@@ -79,14 +79,16 @@ const waitForConnection = async () => {
 
 // Função assíncrona para enviar mensagens para um número específico
 const sendBailey = async (number, message) => {
-  if (!sock) throw new Error("🚫 Socket não inicializado."); 
+  if (!sock) throw new Error("🚫 Socket não inicializado.");
   await waitForConnection(); // Aguarda a conexão ser estabelecida antes de enviar
 
   try {
-    console.log(`📤 Enviando mensagem para ${number}...`);
+    console.log(`📤 Enviando mensagem para ${number}... `);
     // Envia a mensagem usando o socket
     await sock.sendMessage(`${number}@s.whatsapp.net`, { text: message });
-    console.log(`✅ Mensagem enviada para ${number}`);
+    console.log(
+      `✅ Mensagem enviada para ${number} às ${new Date().toLocaleTimeString()}`
+    );
   } catch (error) {
     console.error("❌ Erro ao enviar mensagem:", error.message || error); // Trata erros ao enviar mensagem
     throw error; // Relança o erro
@@ -95,13 +97,12 @@ const sendBailey = async (number, message) => {
 
 // Função para enviar uma mensagem específica para o administrador
 const sendAdm = async (message) => {
-  
-  await sendBailey(sock.user.id.split(':')[0], message);
+  await sendBailey(sock.user.id.split(":")[0], message);
 };
 
 // Exporta as funções para uso externo
 module.exports = {
-  connect, 
-  sendBailey, 
-  sendAdm, 
+  connect,
+  sendBailey,
+  sendAdm,
 };
