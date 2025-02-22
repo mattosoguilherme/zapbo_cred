@@ -57,6 +57,7 @@ const connect = async () => {
     } else if (connection === "open") {
  
       console.log("✅ Conexão estabelecida!");
+      console.log('Número logado:', sock.user.id.split(':')[0]); 
       isConnected = true; 
     }
   });
@@ -95,7 +96,7 @@ const sendBailey = async (number, message) => {
 // Função para enviar uma mensagem específica para o administrador
 const sendAdm = async (message) => {
   
-  await sendBailey("5511916515603", message);
+  await sendBailey(sock.user.id.split(':')[0], message);
 };
 
 // Exporta as funções para uso externo
