@@ -134,7 +134,7 @@ class MessageService {
     );
 
     const msg =
-      "💰 **Precisando de dinheiro rápido?** 💰\n\n🚀 Saque seu **FGTS bloqueado** em menos de **10 minutos** – mesmo com cadeado! ✅\n\n🔥 **Sem burocracia, sem complicação!** 🔥\n\n📲 Chame agora no WhatsApp e resolva sua vida financeira:\n\n👉 [CLIQUE AQUI](https://wa.me/5511916515603) 👈";
+      "💰 *Precisando de dinheiro rápido?* 💰\n\n🚀 Saque seu *FGTS bloqueado* em menos de *10 minutos* – mesmo com cadeado! ✅\n\n🔥 *Sem burocracia, sem complicação!* 🔥\n\n📲 Chame agora no WhatsApp e resolva sua vida financeira:\n\n👉[CLIQUE AQUI](https://wa.me/5511916515603) 👈";
 
     while (true) {
       if (!this.isWithinSchedule()) {

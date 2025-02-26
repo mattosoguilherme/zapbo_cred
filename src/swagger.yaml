@@ -68,7 +68,7 @@ paths:
 
   /send:
     post:
-      summary: Envia uma mensagem com foto para um número.
+      summary: Envia uma mensagem para um número.
       description: Envia uma mensagem de texto e foto para um número armazenado no banco de dados.
       requestBody:
         required: true
