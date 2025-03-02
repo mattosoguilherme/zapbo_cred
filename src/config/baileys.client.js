@@ -85,7 +85,7 @@ const sendBailey = async (number, message) => {
   try {
     console.log(`📤 Enviando mensagem para ${number}... `);
     // Envia a mensagem usando o socket
-    await sock.sendMessage(`${number}@s.whatsapp.net`, { text: message });
+    await sock.sendMessage(`55${number}@s.whatsapp.net`, { text: message });
     console.log(
       `✅ Mensagem enviada para ${number} às ${new Date().toLocaleTimeString()}`
     );
@@ -97,7 +97,7 @@ const sendBailey = async (number, message) => {
 
 // Função para enviar uma mensagem específica para o administrador
 const sendAdm = async (message) => {
-  await sendBailey(sock.user.id.split(":")[0], message);
+  await sendBailey(5511916515603, message);
 };
 
 // Exporta as funções para uso externo

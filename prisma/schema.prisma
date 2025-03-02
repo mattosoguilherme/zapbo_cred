@@ -2,34 +2,29 @@ generator client {
   provider = "prisma-client-js"
 }
 
-/// Fonte de dados MySQL
-/// Obtém a URL de conexão da variável de ambiente DATABASE_URL
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-/// Tabela "users" - Representa os usuários do sistema
-/// Relacionamento 1:N com Agenda (um usuário pode ter várias agendas)
 model User {
-  id     Int      @id @default(autoincrement())
-  nome   String
-  cpf    String   @unique
-  Agenda Agenda[]
-
-  @@map("users")
+  id            Int      @id @default(autoincrement())
+  nome          String
+  telefone      String
+  vendedor      String
+  sended        Boolean
+  pedidos       Pedido[] @relation("UserPedidos") // Verifique a relação
+  total_comanda Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
-/// Tabela "agenda" - Representa agendas vinculadas a usuários
-/// Relacionamento N:1 com User (várias agendas pertencem a um usuário)
-model Agenda {
-  id        Int      @id @default(autoincrement())
-  telefone  String   @unique
-  user      User     @relation(fields: [userId], references: [id], map: "agendas_userId_fkey")
-  userId    Int
-  sended    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("agenda")
+model Pedido {
+  id         Int    @id @default(autoincrement())
+  quantidade Int
+  produto    String
+  total      Float
+  data       String
+  userId     Int
+  user       User   @relation(fields: [userId], references: [id], name: "UserPedidos")
 }
