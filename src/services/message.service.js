@@ -6,8 +6,8 @@ const { log } = require("console");
 
 class MessageService {
   constructor() {
-    this.startHour = 6; // Hora de início (7h da manhã, por exemplo)
-    this.endHour = 1; // Hora de término (21h, por exemplo)
+    this.startHour = 14; // Hora de início (7h da manhã, por exemplo)
+    this.endHour = 21; // Hora de término (21h, por exemplo)
     this.delay = 1 * 60 * 1000; // 4 minutos em milissegundos (240000 ms)
   }
 
@@ -95,13 +95,13 @@ class MessageService {
       include: { pedidos: true },
     });
 
-    // while (true) {
-    //   if (!this.isWithinSchedule()) {
-    //     console.log("Fora do horário permitido.");
+    while (true) {
+      if (!this.isWithinSchedule()) {
+        console.log("Fora do horário permitido.");
 
-    //     await new Promise((resolve) => setTimeout(this.delay)); // Espera 5min e tenta novamente;
-    //     continue; // Volta ao início do loop para verificar o horário novamente
-    //   }
+        await new Promise((resolve) => setTimeout(resolve, this.delay)); // Espera 5min e tenta novamente;
+        continue; // Volta ao início do loop para verificar o horário novamente
+      }
 
     console.log("Enviando mensagens...");
 
@@ -138,15 +138,15 @@ class MessageService {
       // Espera 4 minutos antes de enviar a próxima mensagem
       await new Promise((resolve) => setTimeout(resolve, this.delay));
 
-      //   if (!this.isWithinSchedule()) {
-      //     console.log("por hoje deu...");
-      //     await this.endofdayreport();
-      //     break;
-      //   }
+        if (!this.isWithinSchedule()) {
+          console.log("por hoje deu...");
+          // await this.endofdayreport();
+          break;
+        }
     }
 
-    //   break;
-    // }
+      break;
+    }
   }
 }
 
