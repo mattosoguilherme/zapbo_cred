@@ -4,7 +4,7 @@ const {
   makeWASocket,
   Browsers,
 } = require("@whiskeysockets/baileys"); // Baileys é a biblioteca que implementa o WhatsApp Web API
-const fs = require('fs');
+const fs = require("fs");
 const { text } = require("stream/consumers");
 
 // Declaração de variáveis globais
@@ -82,12 +82,35 @@ const waitForConnection = async () => {
 const sendBailey = async (number) => {
   if (!sock) throw new Error("🚫 Socket não inicializado.");
   await waitForConnection(); // Aguarda a conexão ser estabelecida antes de enviar
-  const buffer = fs.readFileSync("c:/arkg.solutions/solutions/agentes/rafa/zabo_financeiro/src/assets/img.png") // Caminho da imagem a ser enviada
+  const buffer = fs.readFileSync(
+    "c:/arkg.solutions/solutions/agentes/rafa/zabo_financeiro/src/assets/img2.png"
+  ); // Caminho da imagem a ser enviada
 
   try {
     console.log(`📤 Enviando mensagem para ${number}... `);
     // Envia a mensagem usando o socket
-    await sock.sendMessage(`${number}@s.whatsapp.net`, { text: message });
+    await sock.sendMessage(`${number}@s.whatsapp.net`, {
+      image: buffer,
+      caption: `📢 Seu diploma está te esperando! 🎓✨
+
+      Você já perdeu uma vaga de emprego, uma promoção ou um concurso porque não tinha o diploma certo? 🤔 Chega disso!
+      
+      Aqui, você pode conquistar seu certificado em até 30 dias 📜🔥 De forma rápida, segura e reconhecida pelo MEC!
+      
+      ✅ Ensinos Fundamental e Médio
+      ✅ Tecnólogos e Graduações
+      
+      Imagine só: você vendo seu nome naquela lista de aprovados, assinando o contrato do emprego dos sonhos ou dando um salto na carreira com um belo aumento 💼
+      E o melhor? Sem burocracia, sem enrolação e totalmente online! 📲💻
+      
+      💡 Com um diploma reconhecido, as oportunidades aparecem!
+      💡 O que antes era um obstáculo, agora pode ser o seu próximo grande passo.
+      
+      Não deixe mais nada te segurar! Seu futuro começa agora. 🚀
+      
+      📲 Chama no WhatsApp e vamos conversar sobre a sua conquista! 💬🔥
+      👉 [https://wa.me/5511916515603]*Fale comigo no WhatsApp!*`,
+    });
     console.log(
       `✅ Mensagem enviada para ${number} às ${new Date().toLocaleTimeString()}`
     );
@@ -99,7 +122,7 @@ const sendBailey = async (number) => {
 
 // Função para enviar uma mensagem específica para o administrador
 const sendAdm = async (message) => {
-  await sendBailey(sock.user.id.split(":")[0], message);
+  await sendBailey("5511916515603", message);
 };
 
 // Exporta as funções para uso externo
