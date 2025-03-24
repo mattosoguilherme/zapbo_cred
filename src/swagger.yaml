@@ -66,35 +66,6 @@ paths:
         "500":
           description: Erro no servidor
 
-  /send:
-    post:
-      summary: Envia uma mensagem para um número.
-      description: Envia uma mensagem de texto e foto para um número armazenado no banco de dados.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Message"
-      responses:
-        "200":
-          description: Mensagem enviada com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    description: Indica se a mensagem foi enviada com sucesso.
-                  message:
-                    type: string
-                    description: Mensagem de confirmação.
-        "400":
-          description: Requisição inválida
-        "500":
-          description: Erro no servidor
-
   /sendToMany:
     post:
       summary: Envia uma mensagem com foto para todos os números armazenados.
@@ -115,58 +86,6 @@ paths:
                     description: Mensagem de confirmação.
         "500":
           description: Erro no servidor
-
-  /dailyReport:
-    post:
-      summary: Gera um relatório diário
-      description: Gera um relatório diário com base nas mensagens enviadas.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ano:
-                  type: integer
-                  description: Ano para o qual o relatório deve ser gerado.
-                mes:
-                  type: integer
-                  description: Mês para o qual o relatório deve ser gerado (1-12).
-                dia:
-                  type: integer
-                  description: Dia para o qual o relatório deve ser gerado (1-31).
-      responses:
-        "200":
-          description: Relatório diário gerado com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: Mensagem de confirmação da geração do relatório.
-        "400":
-          description: Dados inválidos fornecidos
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: Mensagem de erro detalhando o problema.
-        "500":
-          description: Erro no servidor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: Mensagem de erro detalhando o problema.
 
 components:
   schemas:

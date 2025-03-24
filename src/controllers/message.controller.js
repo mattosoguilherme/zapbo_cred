@@ -7,9 +7,9 @@ const path = require("path"); // Módulo para manipulação de caminhos de arqui
 // Classe que contém os métodos para controle das operações de mensagens
 class MessageController {
   // Função para adicionar números a partir de um arquivo JSON
-  async addNumber(req, res) {
+  async create(req, res) {
     try {
-      const diretoryPath = "c:/arkg.solutions/solutions/agentes/rafa/zabo_financeiro/temps/";
+      const diretoryPath = "c:/arkg.solutions/solutions/zapbo_fgts/temps/";
       const file_path = path.join(diretoryPath, `dados_filtrados.json`);
 
       if (!fs.existsSync(file_path)) {
@@ -41,27 +41,6 @@ class MessageController {
     }
   }
 
-  // Função para obter todos os números cadastrados
-  async getNumbers(req, res) {
-    const numbers = await messageService.getNumbers();
-
-    res.status(200).send(numbers);
-  }
-
-  // Função para enviar uma mensagem
-  async sendMessage(req, res) {
-    const { message } = req.body;
-
-    await messageService
-      .send(message)
-      .then(() => {
-        res.status(200).json({ message: "Mensagem enviada com sucesso" });
-      })
-      .catch((error) => {
-        res.status(500).json({ message: "Erro ao enviar mensagem", error });
-      });
-  }
-
   // Função para enviar uma mensagem para múltiplos destinatários
   async sendToMany(req, res) {
     await messageService
@@ -72,23 +51,7 @@ class MessageController {
         });
       })
       .catch((error) => {
-        res.status(500).json({ message: "Erro ao enviar mensagem", error });
-      });
-  }
-
-  // Função para gerar um relatório diário com base na data fornecida
-  async dailyReport(req, res) {
-    const { mes, dia, ano } = req.body;
-
-    const data = new Date(ano, mes - 1, dia);
-
-    await messageService
-      .generateDailyReport(data)
-      .then(() =>
-        res.status(200).json({ message: "Relatório gerado com sucesso" })
-      )
-      .catch((error) => {
-        res.status(500).json({ message: "Erro ao gerar relatório", error });
+        res.status(500).json({ message: error });
       });
   }
 }
