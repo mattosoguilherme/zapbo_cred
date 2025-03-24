@@ -9,7 +9,7 @@ class MessageController {
   // Função para adicionar números a partir de um arquivo JSON
   async addNumber(req, res) {
     try {
-      const diretoryPath = "c:/arkg.solutions/solutions/zapbo_fgts/temps/";
+      const diretoryPath = "c:/arkg.solutions/solutions/agentes/rafa/zabo_financeiro/temps/";
       const file_path = path.join(diretoryPath, `dados_filtrados.json`);
 
       if (!fs.existsSync(file_path)) {

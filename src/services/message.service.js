@@ -116,9 +116,9 @@ class MessageService {
   }
 
   async send(mensagem) {
-    const msg = "TA FUNCIONANDO";
 
-    await sendAdm(msg);
+
+    await sendAdm(mensagem);
   }
 
   // Função para verificar se estamos dentro do horário permitido
@@ -133,9 +133,6 @@ class MessageService {
       (agenda) => agenda.sended === false
     );
 
-    const msg =
-      "💰 *Precisando de dinheiro rápido?* 💰\n\n🚀 Saque seu *FGTS bloqueado* em menos de *10 minutos* – mesmo com cadeado! ✅\n\n🔥 *Sem burocracia, sem complicação!* 🔥\n\n📲 Chame agora no WhatsApp e resolva sua vida financeira:\n\n👉[CLIQUE AQUI](https://wa.me/5511916515603) 👈";
-
     while (true) {
       if (!this.isWithinSchedule()) {
         console.log("Fora do horário permitido.");
@@ -147,7 +144,7 @@ class MessageService {
       console.log("Enviando mensagens...aguarde 4 minutos");
 
       for (let contato of contatos) {
-        await sendBailey(contato.telefone, msg)
+        await sendBailey(contato.telefone)
           .then(async () => {
             await prisma.agenda.update({
               where: { id: contato.id },
