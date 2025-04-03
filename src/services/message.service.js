@@ -15,17 +15,10 @@ class MessageService {
     user = {
       nome: "",
       telefone: 0,
-      vendedor: "",
+      cpf: 0,
       sended: false,
-      pedidos: [
-        {
-          quantidade: 0,
-          produto: "",
-          total: 0,
-          data: "",
-        },
-      ],
-      total_comanda: 0,
+      telefones_secundarios: [0],
+    
     }
   ) {
     // const existingContact = await prisma.user.findFirst({
@@ -41,7 +34,6 @@ class MessageService {
         data: {
           nome: user.nome,
           telefone: String(user.telefone),
-          vendedor: user.vendedor,
           sended: user.sended,
           pedidos: user.pedidos
             ? {

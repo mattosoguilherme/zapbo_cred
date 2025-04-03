@@ -8,23 +8,22 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  nome          String
-  telefone      String
-  vendedor      String
-  sended        Boolean
-  pedidos       Pedido[] @relation("UserPedidos") // Verifique a relação
-  total_comanda Float
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id     Int      @id @default(autoincrement())
+  nome   String
+  cpf    String   @unique
+  Agenda Agenda[]
+
+  @@map("users")
 }
 
-model Pedido {
-  id         Int    @id @default(autoincrement())
-  quantidade Int
-  produto    String
-  total      Float
-  data       String
-  userId     Int
-  user       User   @relation(fields: [userId], references: [id], name: "UserPedidos")
+model Agenda {
+  id       Int      @id @default(autoincrement())
+  telefone String   @unique
+  user     User     @relation(fields: [userId], references: [id], map: "agendas_userId_fkey")
+  userId   Int
+  sended   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("agenda")
 }

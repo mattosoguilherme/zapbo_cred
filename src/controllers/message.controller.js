@@ -7,40 +7,49 @@ const path = require("path"); // Módulo para manipulação de caminhos de arqui
 // Classe que contém os métodos para controle das operações de mensagens
 class MessageController {
   // Função para adicionar números a partir de um arquivo JSON
-  async create(req, res) {
-    try {
-      // subistir o caminho do arquivo para o caminho correto no seu sistema
-      const diretoryPath = "c:/arkg.solutions/zapbo_cred/src/temps/"; // Caminho do diretório onde o arquivo JSON está localizado
-      const file_path = path.join(diretoryPath, `dados_filtrados.json`);
-
-      if (!fs.existsSync(file_path)) {
-        throw new Error(`Arquivo não encontrado: ${file_path}`);
-      }
-
-      const fileData = await fs.promises.readFile(file_path, "utf-8");
-      const clientes = JSON.parse(fileData);
-
-      if (!Array.isArray(clientes) || clientes.length === 0) {
-        return res
-          .status(400)
-          .json({ message: "Nenhum cliente encontrado no arquivo" });
-      }
-
-      const BATCH_SIZE = 10; // Controla a quantidade de requisições paralelas
-      for (let i = 0; i < clientes.length; i += BATCH_SIZE) {
-        await Promise.all(
-          clientes
-            .slice(i, i + BATCH_SIZE)
-            .map((c) => messageService.create_user(c))
-        );
-      }
-
-      res.status(200).json({ message: `Números adicionados com sucesso` });
-    } catch (error) {
-      res.status(500).json({ message: "Erro ao adicionar números", error });
-      console.error(error);
+  async create_user(
+    user = {
+      nome: "",
+      cpf: 0,
+      telefone_principal: 0,
+      telefones_secundarios: [0],
     }
+  ) {
+    let telefones = [];
+
+    telefones.push(user.telefone_principal);
+    telefones = [...telefones, ...user.telefones_secundarios];
+
+    const verifyCpf = await prisma.user.findUnique({
+      where: { cpf: String(user.cpf) },
+    });
+
+    if (verifyCpf) {
+      throw new Error(`CPF ${user.cpf} já cadastrado`);
+    }
+
+    for (const t in telefones) {
+      const verifyTelefone = await prisma.agenda.findUnique({
+        where: { telefone: `55${t}` },
+      });
+      if (verifyTelefone) {
+        throw new Error(`Telefone ${t} já cadastrado`);
+      }
+    }
+
+    return await prisma.user.create({
+      data: {
+        nome: user.nome,
+        cpf: String(user.cpf),
+        Agenda: {
+          create: telefones.map((t = 0) => ({
+            telefone: `55${t}`,
+          })),
+        },
+      },
+    });
   }
+
 
   // Função para enviar uma mensagem para múltiplos destinatários
   async sendToMany(req, res) {
