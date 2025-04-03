@@ -10,7 +10,7 @@ class MessageController {
   async create(req, res) {
     try {
       // subistir o caminho do arquivo para o caminho correto no seu sistema
-      const diretoryPath = "c:/Users/guilh/OneDrive/Área de Trabalho/zapbo_cred/src/temps/dados_filtrados.json";
+      const diretoryPath = "c:/arkg.solutions/zapbo_cred/src/temps/"; // Caminho do diretório onde o arquivo JSON está localizado
       const file_path = path.join(diretoryPath, `dados_filtrados.json`);
 
       if (!fs.existsSync(file_path)) {
