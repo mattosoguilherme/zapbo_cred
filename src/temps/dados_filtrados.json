@@ -1,0 +1,32 @@
+[
+    {
+        "nome": "MARCOS ALMEIDA SILVA",
+        "cpf": 75321469852,
+        "telefone_principal": 41988627690,
+        "telefones_secundarios": [41996547852, 41987451236]
+    },
+    {
+        "nome": "ANA CLARA FERREIRA LIMA",
+        "cpf": 85963214785,
+        "telefone_principal": 41988627690,
+        "telefones_secundarios": [41998745236]
+    },
+    {
+        "nome": "JOÃO PEDRO COSTA RIBEIRO",
+        "cpf": 63214587965,
+        "telefone_principal": 41988627690,
+        "telefones_secundarios": []
+    },
+    {
+        "nome": "LARISSA GOMES SOUZA",
+        "cpf": 14569873214,
+        "telefone_principal": 41988627690,
+        "telefones_secundarios": [41995412378, 41999874563]
+    },
+    {
+        "nome": "CARLOS EDUARDO MENDES",
+        "cpf": 32145698741,
+        "telefone_principal": 41988627690,
+        "telefones_secundarios": [41991234567]
+    }
+]

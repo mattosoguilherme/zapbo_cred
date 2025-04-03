@@ -8,64 +8,6 @@ servers:
     description: zapbo-cred API server
 
 paths:
-  /:
-    get:
-      summary: Obtém todos os números
-      description: Retorna uma lista de todos os números registrados.
-      responses:
-        "200":
-          description: Lista de números obtida com sucesso
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      description: ID do número.
-                    number:
-                      type: string
-                      description: O número de telefone.
-        "500":
-          description: Erro no servidor
-
-    post:
-      summary: Adiciona uma lista de números
-      description: Adiciona uma lista de números à lista de números registrados.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                numbers:
-                  type: array
-                  description: Lista de números de telefone a serem adicionados.
-                  items:
-                    type: string
-                    description: Um número de telefone válido.
-      responses:
-        "201":
-          description: Números adicionados com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  numbersAdded:
-                    type: array
-                    description: Lista dos números adicionados com sucesso.
-                    items:
-                      type: string
-                      description: Número de telefone adicionado.
-        "400":
-          description: Dados inválidos fornecidos
-        "500":
-          description: Erro no servidor
-
   /sendToMany:
     post:
       summary: Envia uma mensagem com foto para todos os números armazenados.
