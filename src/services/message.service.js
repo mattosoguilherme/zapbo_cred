@@ -36,21 +36,24 @@ class MessageService {
     //   throw new Error(`numero ${user.telefone} já cadastrado`);
     // }
 
-    const userCreated = await prisma.user
+    await prisma.user
       .create({
         data: {
           nome: user.nome,
           telefone: String(user.telefone),
           vendedor: user.vendedor,
           sended: user.sended,
-          pedidos: {
-            create: user.pedidos.map((pedido) => ({
-              quantidade: pedido.quantidade,
-              produto: pedido.produto,
-              total: pedido.total,
-              data: pedido.data,
-            })),
-          },
+          pedidos: user.pedidos
+            ? {
+                create: user.pedidos.map((pedido) => ({
+                  quantidade: pedido.quantidade,
+                  produto: pedido.produto,
+                  total: pedido.total,
+                  data: pedido.data,
+                })),
+              }
+            : undefined, // Caso não tenha pedidos, não cria a relação
+
           total_comanda: user.total_comanda,
         },
       })
@@ -128,7 +131,7 @@ class MessageService {
         continue; // Volta ao início do loop para verificar o horário novamente
       }
 
-    console.log("Enviando mensagens...");
+      console.log("Enviando mensagens...");
 
       for (let contato of contatos) {
         await sendBailey(contato.telefone, msg)
@@ -142,15 +145,15 @@ class MessageService {
             console.log("Erro ao enviar mensagem:", error);
           });
 
-      // Espera 4 minutos antes de enviar a próxima mensagem
-      await new Promise((resolve) => setTimeout(resolve, this.delay));
+        // Espera 4 minutos antes de enviar a próxima mensagem
+        await new Promise((resolve) => setTimeout(resolve, this.delay));
 
         if (!this.isWithinSchedule()) {
           console.log("por hoje deu...");
           // await this.endofdayreport();
           break;
         }
-    }
+      }
 
       break;
     }
