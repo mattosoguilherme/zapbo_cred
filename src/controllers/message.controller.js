@@ -9,7 +9,8 @@ class MessageController {
   // Função para adicionar números a partir de um arquivo JSON
   async create(req, res) {
     try {
-      const diretoryPath = ".././temps/dados_filtrados.json";
+      // subistir o caminho do arquivo para o caminho correto no seu sistema
+      const diretoryPath = "c:/Users/guilh/OneDrive/Área de Trabalho/zapbo_cred/src/temps/dados_filtrados.json";
       const file_path = path.join(diretoryPath, `dados_filtrados.json`);
 
       if (!fs.existsSync(file_path)) {
