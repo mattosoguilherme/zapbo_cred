@@ -95,36 +95,61 @@ class MessageService {
       include: { pedidos: true },
     });
 
-    while (true) {
-      if (!this.isWithinSchedule()) {
-        console.log("Fora do horário permitido.");
+    // while (true) {
+    //   if (!this.isWithinSchedule()) {
+    //     console.log("Fora do horário permitido.");
 
-        await new Promise((resolve) => setTimeout(resolve, this.delay)); // Espera 5min e tenta novamente;
-        continue; // Volta ao início do loop para verificar o horário novamente
-      }
+    //     await new Promise((resolve) => setTimeout(resolve, this.delay)); // Espera 5min e tenta novamente;
+    //     continue; // Volta ao início do loop para verificar o horário novamente
+    //   }
 
     console.log("Enviando mensagens...");
 
     for (let contato of contatos) {
       const msg = `
-  📋 *COMANDA DE PEDIDO* 📋
-  
-  👤 Cliente: ${contato.nome}
-  
-  📦 *Pedidos:*
-  ${contato.pedidos
-    .map(
-      (item) =>
-        `➡️ ${item.quantidade}x ${item.produto} - R$ ${item.total},00 (Data: ${item.data})`
-    )
-    .join("\n")}
-  
-  💰 *Total: R$ ${contato.total_comanda},00*
-  
-  Obrigado pela preferência! 😊🍬
-  `;
+      🌟 Olá! Sou a Maju, assistente da loja. 😊  
+    
+      👤 *${contato.nome}*, espero que esteja bem!  
+      Me perdoe pelo horário, mas estou passando para lembrar sobre o pagamento da sua *comanda de fevereiro*.  
+    
+      📋 *COMANDA DE PEDIDO* 📋  
+    
+      📦 *Pedidos:*  
+      ${contato.pedidos
+        .map(
+          (item) =>
+            `➡️ ${item.quantidade}x ${item.produto} - R$ ${item.total},00 (Data: ${item.data})`
+        )
+        .join("\n")}  
+    
+      💰 *Total: R$ ${contato.total_comanda},00*  
+    
+      🔹 Para facilitar, você pode fazer o pagamento via *Pix*:  
+      💳 *Chave Pix (Nubank): 11999241855*  
+    
+      📩 Assim que realizar o pagamento, por gentileza, envie o comprovante para agilizar a confirmação.  
+    
+      Obrigado pela preferência! Qualquer dúvida, estou por aqui. 😊🍬  
+    
+      📲 *Fique por dentro das novidades e promoções!*  
+      👉 Siga a gente no Instagram: [@docinhostialulu_](https://www.instagram.com/docinhostialulu_?igsh=MW1tNDNjODdqeXp3Mg==) 🍭✨  
+      👉 Entre no nosso grupo do WhatsApp e receba ofertas exclusivas: [Clique aqui](https://chat.whatsapp.com/BvgnLYXjYaR8ek68dMeGvK) 💬🎁  
+    `;
 
-      await sendBailey(contato.telefone, msg)
+      const msg_cobranca = ` 🌟 Olá! Sou a Maju, assistente da loja. 😊
+
+👤 ${contato.nome}, espero que esteja bem!
+
+Passando para lembrar que ainda não identificamos o pagamento da sua comanda de fevereiro. Caso já tenha feito, poderia nos encaminhar o comprovante, por favor?
+
+💰 Valor total: R$ ${contato.total_comanda}
+
+Para facilitar, você pode fazer o pagamento via Pix:
+💳 Chave Pix (Nubank): 11999241855
+
+Se precisar de algo ou tiver qualquer dúvida, estou à disposição. Agradecemos a preferência! 😊🍬`;
+
+      await sendBailey(contato.telefone, msg_cobranca)
         .then(async () => {
           await prisma.user.update({
             where: { id: contato.id },
@@ -138,15 +163,15 @@ class MessageService {
       // Espera 4 minutos antes de enviar a próxima mensagem
       await new Promise((resolve) => setTimeout(resolve, this.delay));
 
-        if (!this.isWithinSchedule()) {
-          console.log("por hoje deu...");
-          // await this.endofdayreport();
-          break;
-        }
+      // if (!this.isWithinSchedule()) {
+      //   console.log("por hoje deu...");
+      //   // await this.endofdayreport();
+      //   break;
+      // }
     }
 
-      break;
-    }
+    //   break;
+    // }
   }
 }
 
