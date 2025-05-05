@@ -11,57 +11,6 @@ class MessageService {
     this.delay = 1 * 60 * 1000; // 4 minutos em milissegundos (240000 ms)
   }
 
-  async create_user(
-    user = {
-      nome: "",
-      telefone: 0,
-      vendedor: "",
-      sended: false,
-      pedidos: [
-        {
-          quantidade: 0,
-          produto: "",
-          total: 0,
-          data: "",
-        },
-      ],
-      total_comanda: 0,
-    }
-  ) {
-    // const existingContact = await prisma.user.findFirst({
-    //   where: { telefone: user.telefone },
-    // });
-
-    // if (existingContact) {
-    //   throw new Error(`numero ${user.telefone} já cadastrado`);
-    // }
-
-    const userCreated = await prisma.user
-      .create({
-        data: {
-          nome: user.nome,
-          telefone: String(user.telefone),
-          vendedor: user.vendedor,
-          sended: user.sended,
-          pedidos: {
-            create: user.pedidos.map((pedido) => ({
-              quantidade: pedido.quantidade,
-              produto: pedido.produto,
-              total: pedido.total,
-              data: pedido.data,
-            })),
-          },
-          total_comanda: user.total_comanda,
-        },
-      })
-      .then((userCreated) => {
-        console.log("User created with success", userCreated);
-      })
-      .catch((error) => {
-        console.log("Error to create user", error);
-      });
-  }
-
   async endofdayreport() {
     const startDate = new Date();
     startDate.setHours(0, 0, 0, 0); // Início do dia
@@ -78,7 +27,7 @@ class MessageService {
     });
 
     await sendAdm(
-      `Sra. Romina, boa noite!\n\nZapbo chegou no fim do espediente.\n\nsegue o relatório do dia:\n\n*${totalMessages}* mensagens enviadas.\n\n*PRODUTO: FGTS*\n\nLembra o Guilherme de programar o envio de mensagens para amanhã.\n\n Ótima noite!`
+      `Srs, boa noite!\n\nZapbo chegou no fim do espediente.\n\nsegue o relatório do dia:\n\n*${totalMessages}* mensagens enviadas.\n\n*PRODUTO: FGTS*\n\nLembra o Guilherme de programar o envio de mensagens para amanhã.\n\n Ótima noite!`
     );
   }
 
@@ -95,21 +44,13 @@ class MessageService {
       include: { pedidos: true },
     });
 
-    // while (true) {
-    //   if (!this.isWithinSchedule()) {
-    //     console.log("Fora do horário permitido.");
-
-    //     await new Promise((resolve) => setTimeout(resolve, this.delay)); // Espera 5min e tenta novamente;
-    //     continue; // Volta ao início do loop para verificar o horário novamente
-    //   }
-
     console.log("Enviando mensagens...");
 
     for (let contato of contatos) {
       const msg = `
       🌟 Olá! Sou a Maju, assistente da loja. 😊  
     
-      👤 *${contato.nome}*, espero que esteja bem!  
+      👤 *${contato.nome}*, \n espero que esteja bem!  
       Me perdoe pelo horário, mas estou passando para lembrar sobre o pagamento da sua *comanda de fevereiro*.  
     
       📋 *COMANDA DE PEDIDO* 📋  
@@ -135,7 +76,6 @@ class MessageService {
       👉 Siga a gente no Instagram: [@docinhostialulu_](https://www.instagram.com/docinhostialulu_?igsh=MW1tNDNjODdqeXp3Mg==) 🍭✨  
       👉 Entre no nosso grupo do WhatsApp e receba ofertas exclusivas: [Clique aqui](https://chat.whatsapp.com/BvgnLYXjYaR8ek68dMeGvK) 💬🎁  
     `;
-
       const msg_cobranca = ` 🌟 Olá! Sou a Maju, assistente da loja. 😊
 
 👤 ${contato.nome}, espero que esteja bem!
@@ -149,7 +89,7 @@ Para facilitar, você pode fazer o pagamento via Pix:
 
 Se precisar de algo ou tiver qualquer dúvida, estou à disposição. Agradecemos a preferência! 😊🍬`;
 
-      await sendBailey(contato.telefone, msg_cobranca)
+      await sendBailey(contato.telefone, msg)
         .then(async () => {
           await prisma.user.update({
             where: { id: contato.id },
@@ -169,9 +109,16 @@ Se precisar de algo ou tiver qualquer dúvida, estou à disposição. Agradecemo
       //   break;
       // }
     }
+  }
 
-    //   break;
-    // }
+  async sendToOne(telefone, msg) {
+    await sendBailey(telefone, msg)
+      .then(async () => {
+        
+      })
+      .catch((error) => {
+        console.log("Erro ao enviar mensagem:", error);
+      });
   }
 }
 

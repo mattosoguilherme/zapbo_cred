@@ -7,24 +7,93 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            Int      @id @default(autoincrement())
-  nome          String
-  telefone      String
-  vendedor      String
-  sended        Boolean
-  pedidos       Pedido[] @relation("UserPedidos") // Verifique a relação
-  total_comanda Float
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+model cardapio {
+  id              Int          @id @default(autoincrement())
+  urlFoto         String
+  titulo          String
+  descricao       String
+  preco           Float
+  active          Boolean?     @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime
+  cpl             Float
+  cpu             Float
+  lucro           Float
+  quantidade_lote Int
+  pedidoitem      pedidoitem[]
 }
 
-model Pedido {
-  id         Int    @id @default(autoincrement())
-  quantidade Int
-  produto    String
-  total      Float
-  data       String
-  userId     Int
-  user       User   @relation(fields: [userId], references: [id], name: "UserPedidos")
+model comanda {
+  id             Int      @id @default(autoincrement())
+  userId         String
+  status         String   @default("PENDENTE")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime
+  nome_cliente   String
+  saldo_pendente Float
+  saldo_quitado  Float
+  total          Float
+  user           user     @relation(fields: [userId], references: [id])
+  pedido         pedido[]
+
+  @@index([userId], map: "comanda_userId_fkey")
+}
+
+model message_log {
+  id        Int      @id @default(autoincrement())
+  message   Boolean
+  userId    String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  user      user?
+}
+
+model pedido {
+  id               Int          @id @default(autoincrement())
+  userId           String
+  status           String
+  metodo_pagamento String
+  total            Float
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime
+  comandaId        Int?
+  comanda          comanda?     @relation(fields: [comandaId], references: [id])
+  user             user         @relation(fields: [userId], references: [id])
+  pedidoitem       pedidoitem[]
+
+  @@index([comandaId], map: "pedido_comandaId_fkey")
+  @@index([userId], map: "pedido_userId_fkey")
+}
+
+model pedidoitem {
+  id             Int      @id @default(autoincrement())
+  cardapioId     Int
+  quantidade     Int      @default(1)
+  valor_unitario Float
+  pedidoId       Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime
+  cardapio       cardapio @relation(fields: [cardapioId], references: [id], map: "PedidoItem_cardapioId_fkey")
+  pedido         pedido?  @relation(fields: [pedidoId], references: [id], map: "PedidoItem_pedidoId_fkey")
+
+  @@index([cardapioId], map: "PedidoItem_cardapioId_fkey")
+  @@index([pedidoId], map: "PedidoItem_pedidoId_fkey")
+}
+
+model user {
+  id           String       @id
+  email        String       @unique
+  password     String
+  nome         String?
+  contato      String       @unique
+  produto      String
+  unidade      String
+  matricula    String?      @unique
+  aniversario  DateTime
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime
+  messageLogId Int?         @unique
+  comanda      comanda[]
+  pedido       pedido[]
+  message_log  message_log? @relation(fields: [messageLogId], references: [id])
 }

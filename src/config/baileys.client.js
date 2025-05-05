@@ -97,7 +97,7 @@ const sendBailey = async (number, message) => {
 
 // Função para enviar uma mensagem específica para o administrador
 const sendAdm = async (message) => {
-  await sendBailey(5511916515603, message);
+  await sendBailey(5511992767398, message);
 };
 
 // Exporta as funções para uso externo
