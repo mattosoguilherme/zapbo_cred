@@ -6,7 +6,7 @@ yarn-error.log*
 
 # Configurações do ambiente
 .env
-/auth_info_baileys
+
 
 # Diretórios de upload temporários
 /uploads
