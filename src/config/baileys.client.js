@@ -1,53 +1,62 @@
-const { Boom } = require("@hapi/boom"); // Utilizada para erros mais estruturados (não está sendo usada diretamente aqui)
+const fs = require("fs");
+const path = require("path");
 const {
   DisconnectReason,
   useMultiFileAuthState,
   makeWASocket,
   Browsers,
-} = require("@whiskeysockets/baileys"); // Baileys é a biblioteca que implementa o WhatsApp Web API
+} = require("@whiskeysockets/baileys");
 
-// Declaração de variáveis globais
-let sock = null; // Variável para armazenar a instância do socket do WhatsApp
-let state = null; // Variável para armazenar o estado de autenticação
-let saveCreds = null; // Função para salvar as credenciais de autenticação
-let isConnected = false; // Flag para indicar se a conexão com o WhatsApp foi estabelecida
+const AUTH_FOLDER = "auth_info_baileys";
 
-// Função assíncrona para conectar ao WhatsApp
+// Garante que a pasta de autenticação exista
+if (!fs.existsSync(path.resolve(AUTH_FOLDER))) {
+  fs.mkdirSync(path.resolve(AUTH_FOLDER), { recursive: true });
+}
+
+// Variáveis globais
+let sock = null;
+let state = null;
+let saveCreds = null;
+let isConnected = false;
+
+// Função principal de conexão ao WhatsApp
 const connect = async () => {
-  // Obtém o estado de autenticação, que pode ser salvo em múltiplos arquivos
-  const authState = await useMultiFileAuthState("auth_info_baileys");
+  const authState = await useMultiFileAuthState(AUTH_FOLDER);
   state = authState.state;
   saveCreds = authState.saveCreds;
 
-  // Criação da instância do socket para comunicação com o WhatsApp
   sock = makeWASocket({
     auth: state,
-    printQRInTerminal: true, // Exibe o QR Code no terminal para escanear
-    browser: Browsers.windows("Desktop"), // Define o nome do browser (usado para conectar)
+    printQRInTerminal: true,
+    browser: Browsers.windows("Desktop"),
   });
 
-  // Evento que captura as mensagens de WhatsApp
+  // Evento: recebimento de mensagens
   sock.ev.on("messages.upsert", async ({ messages }) => {
     for (const msg of messages) {
       if (msg.key.remoteJid === "status@broadcast") {
-        // Ignora as mensagens de status do WhatsApp (broadcasts)
         console.log("📢 Ignorando mensagem de Status...");
         return;
       }
+
+      // Tratar mensagens recebidas aqui, se necessário
     }
   });
 
-  // Evento que lida com atualizações de conexão
+  // Evento: atualização de conexão
   sock.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect } = update;
 
     if (connection === "close") {
-      const errorCode = lastDisconnect?.error?.output?.statusCode; // Captura o código de erro da desconexão
+      const errorCode = lastDisconnect?.error?.output?.statusCode;
       console.log(`⚠️ Conexão fechada. Código: ${errorCode}`);
 
       if (errorCode === DisconnectReason.loggedOut) {
-        console.log("🚨 Usuário deslogado. Escaneie o QR Code novamente.");
+        console.log("🚨 Usuário deslogado. Limpando autenticação...");
+        fs.rmSync(path.resolve(AUTH_FOLDER), { recursive: true, force: true });
         isConnected = false;
+        setTimeout(connect, 3000);
         return;
       }
 
@@ -61,46 +70,49 @@ const connect = async () => {
     }
   });
 
-  // Atualiza as credenciais de autenticação quando há alterações
+  // Evento: atualização de credenciais
   sock.ev.on("creds.update", saveCreds);
 };
 
-// Função assíncrona para aguardar a conexão ser estabelecida
+// Aguarda conexão ativa
 const waitForConnection = async () => {
-  let attempts = 0; // Contador de tentativas
+  let attempts = 0;
+
   while (!isConnected) {
-    if (attempts >= 15)
-      throw new Error("⏳ Tempo limite atingido para conexão!"); // Se não conectar em 15 tentativas, lança erro
+    if (attempts >= 15) {
+      throw new Error("⏳ Tempo limite atingido para conexão!");
+    }
+
     console.log("⏳ Aguardando conexão...");
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Aguarda 2 segundos antes de tentar novamente
-    attempts++; // Incrementa o contador de tentativas
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    attempts++;
   }
 };
 
-// Função assíncrona para enviar mensagens para um número específico
+// Envia mensagem para um número específico
 const sendBailey = async (number, message) => {
   if (!sock) throw new Error("🚫 Socket não inicializado.");
-  await waitForConnection(); // Aguarda a conexão ser estabelecida antes de enviar
+  await waitForConnection();
 
   try {
-    console.log(`📤 Enviando mensagem para ${number}... `);
-    // Envia a mensagem usando o socket
-    await sock.sendMessage(`55${number}@s.whatsapp.net`, { text: message });
-    console.log(
-      `✅ Mensagem enviada para ${number} às ${new Date().toLocaleTimeString()}`
-    );
+    const jid = `55${number}@s.whatsapp.net`;
+    console.log(`📤 Enviando mensagem para ${number}...`);
+
+    await sock.sendMessage(jid, { text: message });
+
+    console.log(`✅ Mensagem enviada para ${number} às ${new Date().toLocaleTimeString()}`);
   } catch (error) {
-    console.error("❌ Erro ao enviar mensagem:", error.message || error); // Trata erros ao enviar mensagem
-    throw error; // Relança o erro
+    console.error("❌ Erro ao enviar mensagem:", error.message || error);
+    throw error;
   }
 };
 
-// Função para enviar uma mensagem específica para o administrador
+// Envia mensagem para o número do administrador
 const sendAdm = async (message) => {
-  await sendBailey(5511992767398, message);
+  await sendBailey(11992767398, message);
 };
 
-// Exporta as funções para uso externo
+// Exporta as funções
 module.exports = {
   connect,
   sendBailey,
